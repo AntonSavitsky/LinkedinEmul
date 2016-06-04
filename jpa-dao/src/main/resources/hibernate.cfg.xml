@@ -23,7 +23,7 @@
 
         <!-- names of entity classes to persist -->
         <mapping class="org.savitsky.linkedin.domain.Member"/>
-
+        <mapping class="org.savitsky.linkedin.domain.Group"/>
     </session-factory>
 
 </hibernate-configuration>

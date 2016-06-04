@@ -8,7 +8,7 @@ import java.util.Collection;
  * Created by LenovoUser on 02.06.2016.
  */
 @Entity
-@Table(name = "Members")
+@Table(name = "members")
 public class Member {
     @Id
     @GeneratedValue
@@ -31,13 +31,17 @@ public class Member {
     private String otherDetails;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "connections", uniqueConstraints = {
-            @UniqueConstraint(columnNames = {"member1", "member2"}),
-            },
-            joinColumns = {
-            @JoinColumn(name = "member1", referencedColumnName = "memberId",nullable = false)}, inverseJoinColumns = {
-            @JoinColumn(name = "member2", referencedColumnName = "memberId", nullable = false)})
+    @JoinTable(name = "connections",
+            uniqueConstraints = {@UniqueConstraint(columnNames = {"member1", "member2"})},
+            joinColumns = {@JoinColumn(name = "member1", referencedColumnName = "memberId",nullable = false)},
+            inverseJoinColumns = {@JoinColumn(name = "member2", referencedColumnName = "memberId", nullable = false)})
     private Collection<Member> connections=new ArrayList<Member>();
+
+    @OneToMany(mappedBy = "manager")
+    private Collection<Group> groupsManaged=new ArrayList<Group>();
+
+    @ManyToMany(mappedBy = "followers")
+    private Collection<Group> inGroups=new ArrayList<Group>();
 
     public enum Gender {
         MALE, FEMALE
@@ -97,5 +101,21 @@ public class Member {
 
     public void setConnections(Collection<Member> connections) {
         this.connections = connections;
+    }
+
+    public Collection<Group> getGroupsManaged() {
+        return groupsManaged;
+    }
+
+    public void setGroupsManaged(Collection<Group> groupsManaged) {
+        this.groupsManaged = groupsManaged;
+    }
+
+    public Collection<Group> getInGroups() {
+        return inGroups;
+    }
+
+    public void setInGroups(Collection<Group> inGroups) {
+        this.inGroups = inGroups;
     }
 }
