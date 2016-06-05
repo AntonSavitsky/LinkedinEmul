@@ -1,8 +1,11 @@
 package org.savitsky.linkedin.dao;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.savitsky.linkedin.domain.ConnectionRequest;
 import org.savitsky.linkedin.domain.Group;
+import org.savitsky.linkedin.domain.GroupFollowingRequest;
 import org.savitsky.linkedin.domain.Member;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -47,12 +50,35 @@ public class DaoImpl implements Dao{
     }
 
     @Override
-    public void connect(Member member1, Member member2) {
+    public Collection<GroupFollowingRequest> getAllGroupFollowingRequests(Member member) {
+        //TODO
+        return null;
+    }
+
+    @Override
+    public void acceptConnection(Member member1, Member member2) {
         Session session = sessionFactory.getCurrentSession();
-        Member freshMember1 = (Member) session.get(Member.class, member1.getMemberId());
-        freshMember1.getConnections().add(member2);
-        Member freshMember2 = (Member) session.get(Member.class, member2.getMemberId());
-        freshMember2.getConnections().add(freshMember1);
+        Member persistedMember1 = (Member) session.get(Member.class, member1.getMemberId());
+        persistedMember1.getConnections().add(member2);
+        Member persistedMember2 = (Member) session.get(Member.class, member2.getMemberId());
+        persistedMember2.getConnections().add(persistedMember1);
+
+        String hql = "delete from ConnectionRequest where requestFrom.memberId=? and requestTo.memberId=?";
+        Query query = session.createQuery(hql);
+        query.setInteger(0, member1.getMemberId());
+        query.setInteger(1, member2.getMemberId());
+        query.executeUpdate();
+    }
+
+    @Override
+    public void denyConnectionRequest(Member member1, Member member2) {
+        Session session = sessionFactory.getCurrentSession();
+
+        String hql = "delete from ConnectionRequest where requestFrom.memberId=? and requestTo.memberId=?";
+        Query query = session.createQuery(hql);
+        query.setInteger(0, member1.getMemberId());
+        query.setInteger(1, member2.getMemberId());
+        query.executeUpdate();
     }
 
 
@@ -81,6 +107,16 @@ public class DaoImpl implements Dao{
     }
 
     @Override
+    public void requestFollowingGroup(Group group, Member member) {
+        Session session = sessionFactory.getCurrentSession();
+
+        GroupFollowingRequest groupFollowingRequest=new GroupFollowingRequest();
+        groupFollowingRequest.setGroup(group);
+        groupFollowingRequest.setMemberWillingToFollow(member);
+        session.save(groupFollowingRequest);
+    }
+
+    @Override
     public Group groupById(int id) {
         Session session = sessionFactory.getCurrentSession();
         return (Group) session.get(Group.class, id);
@@ -96,6 +132,11 @@ public class DaoImpl implements Dao{
     public void deleteGroup(Group group) {
         Session session = sessionFactory.getCurrentSession();
         session.delete(group);
+    }
+
+    @Override
+    public void getAllIncomingRequests(Group group) {
+        //TODO
     }
 
     @Override
@@ -124,5 +165,22 @@ public class DaoImpl implements Dao{
         Collection<Member> allFirstLevelConnections=firstLevelConnections(member1);
         return allFirstLevelConnections.contains(member2);
     }
+
+    @Override
+    public int requestConnection(Member member1, Member member2) {
+        Session session = sessionFactory.getCurrentSession();
+
+        ConnectionRequest member1Request=new ConnectionRequest();
+        member1Request.setRequestFrom(member1);
+        member1Request.setRequestTo(member2);
+
+        Integer requestId= (Integer) session.save(member1Request);
+
+        Member persistedMember2= (Member) session.get(Member.class, member2.getMemberId());
+        persistedMember2.getInRequests().add(member1Request);
+
+        return requestId;
+    }
+
 
 }

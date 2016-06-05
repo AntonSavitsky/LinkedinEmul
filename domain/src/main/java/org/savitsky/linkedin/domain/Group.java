@@ -31,6 +31,8 @@ public class Group {
             inverseJoinColumns = {@JoinColumn(name = "follower_id", referencedColumnName = "memberId",nullable = false)})
     private Collection<Member> followers=new ArrayList<Member>();
 
+    @OneToMany(mappedBy = "group", fetch = FetchType.EAGER)
+    private Collection<GroupFollowingRequest> incomingFollowingRequests=new ArrayList<>();
 
     public int getGroupId() {
         return groupId;
@@ -70,5 +72,13 @@ public class Group {
 
     public void setDetails(String details) {
         this.details = details;
+    }
+
+    public Collection<GroupFollowingRequest> getIncomingFollowingRequests() {
+        return incomingFollowingRequests;
+    }
+
+    public void setIncomingFollowingRequests(Collection<GroupFollowingRequest> incomingFollowingRequests) {
+        this.incomingFollowingRequests = incomingFollowingRequests;
     }
 }

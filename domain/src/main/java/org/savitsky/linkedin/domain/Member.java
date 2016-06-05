@@ -43,6 +43,15 @@ public class Member {
     @ManyToMany(mappedBy = "followers")
     private Collection<Group> inGroups=new ArrayList<Group>();
 
+    @OneToMany(mappedBy = "requestTo")
+    private Collection<ConnectionRequest> inRequests=new ArrayList<>();
+
+    @OneToMany(mappedBy = "requestFrom")
+    private Collection<ConnectionRequest> outRequests=new ArrayList<>();
+
+    @OneToMany(mappedBy = "memberWillingToFollow", fetch = FetchType.EAGER)
+    private Collection<GroupFollowingRequest> followingGroupRequests=new ArrayList<>();
+
     public enum Gender {
         MALE, FEMALE
     }
@@ -117,5 +126,29 @@ public class Member {
 
     public void setInGroups(Collection<Group> inGroups) {
         this.inGroups = inGroups;
+    }
+
+    public Collection<ConnectionRequest> getInRequests() {
+        return inRequests;
+    }
+
+    public void setInRequests(Collection<ConnectionRequest> inRequests) {
+        this.inRequests = inRequests;
+    }
+
+    public Collection<ConnectionRequest> getOutRequests() {
+        return outRequests;
+    }
+
+    public void setOutRequests(Collection<ConnectionRequest> outRequests) {
+        this.outRequests = outRequests;
+    }
+
+    public Collection<GroupFollowingRequest> getFollowingGroupRequests() {
+        return followingGroupRequests;
+    }
+
+    public void setFollowingGroupRequests(Collection<GroupFollowingRequest> followingGroupRequests) {
+        this.followingGroupRequests = followingGroupRequests;
     }
 }

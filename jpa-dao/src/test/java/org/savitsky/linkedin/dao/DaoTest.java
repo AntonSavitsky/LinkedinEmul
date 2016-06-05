@@ -3,6 +3,7 @@ package org.savitsky.linkedin.dao;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.savitsky.linkedin.domain.Group;
+import org.savitsky.linkedin.domain.GroupFollowingRequest;
 import org.savitsky.linkedin.domain.Member;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -31,17 +32,25 @@ public class DaoTest {
     @Test
     public void testSaveMember(){
         Member member=new Member();
-        member.setFirstName("Garik");
-        member.setLastName("Badyuk");
+        member.setFirstName("Alexander");
+        member.setLastName("Borohov");
         member.setGender(Member.Gender.MALE);
         dao.saveMember(member);
     }
 
     @Test
-    public void testConnect(){
-        Member sav=dao.memberById(3);
-        Member bor=dao.memberById(6);
-        dao.connect(sav, bor);
+    public void testAcceptConnection(){
+        Member sav=dao.memberById(1);
+        Member bor=dao.memberById(2);
+        dao.acceptConnection(sav, bor);
+    }
+
+
+    @Test
+    public void testRequestConnection(){
+        Member sav=dao.memberById(1);
+        Member bor=dao.memberById(2);
+        dao.requestConnection(sav, bor);
     }
 
     @Test
@@ -85,5 +94,21 @@ public class DaoTest {
         Collection<Member> allSecondLevelConnections=dao.secondLevelConnections(sav);
         for(Member m: allSecondLevelConnections)
             System.out.println(m.getFirstName());
+    }
+
+    @Test
+    public void testRequestFollowingGroup(){
+        Group group=dao.groupById(2);
+        Member member=dao.memberById(1);
+
+        dao.requestFollowingGroup(group, member);
+    }
+
+    @Test
+    public void testSome(){
+        Collection<GroupFollowingRequest> reqs=dao.memberById(1).getFollowingGroupRequests();
+        for(GroupFollowingRequest r: reqs){
+            System.out.println(r.getMemberWillingToFollow().getFirstName());
+        }
     }
 }

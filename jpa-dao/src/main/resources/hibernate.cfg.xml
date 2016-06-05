@@ -24,6 +24,8 @@
         <!-- names of entity classes to persist -->
         <mapping class="org.savitsky.linkedin.domain.Member"/>
         <mapping class="org.savitsky.linkedin.domain.Group"/>
+        <mapping class="org.savitsky.linkedin.domain.ConnectionRequest"/>
+        <mapping class="org.savitsky.linkedin.domain.GroupFollowingRequest"/>
     </session-factory>
 
 </hibernate-configuration>
